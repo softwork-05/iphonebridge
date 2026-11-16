@@ -1,0 +1,781 @@
+/* ==========================================================================
+   GSM Call Bridge - iOS Client Stylesheet (Glassmorphic Dark Mode)
+   ========================================================================== */
+
+:root {
+    --bg-black: #000000;
+    --bg-card: rgba(28, 28, 30, 0.75);
+    --bg-glass: rgba(255, 255, 255, 0.08);
+    --bg-glass-hover: rgba(255, 255, 255, 0.14);
+    --bg-glass-active: rgba(255, 255, 255, 0.25);
+    --border-glass: rgba(255, 255, 255, 0.15);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+
+    --ios-green: #30D158;
+    --ios-green-glow: rgba(48, 209, 88, 0.45);
+    --ios-red: #FF453A;
+    --ios-red-glow: rgba(255, 69, 58, 0.45);
+    --ios-blue: #0A84FF;
+    --ios-yellow: #FFD60A;
+    
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(235, 235, 245, 0.6);
+    --text-tertiary: rgba(235, 235, 245, 0.38);
+
+    --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+    
+    --safe-top: env(safe-area-inset-top, 20px);
+    --safe-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-black);
+    color: var(--text-primary);
+    font-family: var(--font-stack);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   App Shell & Layout
+   ========================================================================== */
+.ios-app-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    position: relative;
+    background: radial-gradient(circle at 50% 0%, #151824 0%, #000000 70%);
+}
+
+/* ==========================================================================
+   Status Header (Pills for Host & SIM)
+   ========================================================================== */
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: calc(var(--safe-top) + 8px) 16px 8px 16px;
+    z-index: 10;
+}
+
+.status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-subtle);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--ios-red);
+    box-shadow: 0 0 8px var(--ios-red-glow);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.status-indicator-dot.connected {
+    background-color: var(--ios-green);
+    box-shadow: 0 0 8px var(--ios-green-glow);
+}
+
+.host-battery {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+.host-latency {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--ios-green);
+    font-family: monospace;
+}
+
+/* Cellular Signal Meter */
+.signal-meter {
+    display: flex;
+    align-items: flex-end;
+    gap: 2.5px;
+    height: 12px;
+}
+
+.signal-meter .bar {
+    width: 3px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 1px;
+}
+
+.signal-meter .bar-1 { height: 3px; }
+.signal-meter .bar-2 { height: 6px; }
+.signal-meter .bar-3 { height: 9px; }
+.signal-meter .bar-4 { height: 12px; }
+
+.signal-meter[data-level="1"] .bar-1 { background-color: var(--text-primary); }
+.signal-meter[data-level="2"] .bar-1,
+.signal-meter[data-level="2"] .bar-2 { background-color: var(--text-primary); }
+.signal-meter[data-level="3"] .bar-1,
+.signal-meter[data-level="3"] .bar-2,
+.signal-meter[data-level="3"] .bar-3 { background-color: var(--text-primary); }
+.signal-meter[data-level="4"] .bar { background-color: var(--text-primary); }
+
+/* ==========================================================================
+   Views Container & Tab Switching
+   ========================================================================== */
+.views-container {
+    flex: 1;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.view {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    padding: 0 20px;
+}
+
+.view.active-view {
+    display: flex;
+}
+
+/* ==========================================================================
+   Keypad Dialer View
+   ========================================================================== */
+.dialer-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    padding-top: 10px;
+}
+
+.number-input-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#dialInput {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-size: 38px;
+    font-weight: 300;
+    text-align: center;
+    letter-spacing: 1px;
+    font-family: var(--font-stack);
+    height: 52px;
+}
+
+.btn-backspace {
+    position: absolute;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-backspace.visible {
+    display: flex;
+}
+
+.sim-selector-badge {
+    font-size: 11px;
+    color: var(--ios-blue);
+    background: rgba(10, 132, 255, 0.12);
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* Keypad Grid (3x4) */
+.keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px 24px;
+    max-width: 310px;
+    margin: 10px auto 20px auto;
+}
+
+.keypad-btn {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.1s ease;
+    margin: 0 auto;
+}
+
+.keypad-btn:active {
+    background: var(--bg-glass-active);
+    transform: scale(0.92);
+}
+
+.key-digit {
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.key-digit.star {
+    font-size: 38px;
+    padding-top: 8px;
+}
+
+.key-letters {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Call Button */
+.call-action-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.btn-start-call {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--ios-green);
+    border: none;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px var(--ios-green-glow);
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-start-call:active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 10px var(--ios-green-glow);
+}
+
+/* ==========================================================================
+   Recents & Settings Views
+   ========================================================================== */
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+}
+
+.view-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.btn-clear-logs {
+    background: transparent;
+    border: none;
+    color: var(--ios-blue);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.recents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.recent-call-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+}
+
+.call-info-left .caller-num {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.call-info-left .caller-type {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.call-info-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.call-info-right .call-time {
+    font-size: 13px;
+    color: var(--text-tertiary);
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-tertiary);
+    margin-top: 60px;
+    font-size: 15px;
+}
+
+/* Settings Form */
+.settings-group {
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 15px;
+}
+
+.settings-item:last-child {
+    border-bottom: none;
+}
+
+.settings-item input, .settings-item select {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--text-primary);
+    font-size: 14px;
+    text-align: right;
+    outline: none;
+}
+
+.settings-value {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.settings-action {
+    margin-top: 24px;
+}
+
+.btn-primary {
+    width: 100%;
+    height: 50px;
+    background: var(--ios-blue);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.12);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   Bottom Navigation Tab Bar
+   ========================================================================== */
+.bottom-tab-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 54px;
+    padding-bottom: var(--safe-bottom);
+    background: rgba(18, 18, 20, 0.85);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-top: 1px solid var(--border-subtle);
+    z-index: 20;
+}
+
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    gap: 4px;
+    width: 60px;
+}
+
+.tab-item span {
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.tab-item.active {
+    color: var(--ios-blue);
+}
+
+/* ==========================================================================
+   Fullscreen Call Overlays (Native iOS Incoming & Active Screens)
+   ========================================================================== */
+.fullscreen-call-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: calc(var(--safe-top) + 24px) 24px calc(var(--safe-bottom) + 32px) 24px;
+    opacity: 1;
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fullscreen-call-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(100%);
+}
+
+.call-overlay-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 14, 0.92);
+    backdrop-filter: blur(35px);
+    -webkit-backdrop-filter: blur(35px);
+    z-index: -1;
+}
+
+/* Incoming Call Layout */
+.incoming-info-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.call-type-badge {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ios-green);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.caller-name {
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.caller-subtext {
+    font-size: 20px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-bottom: 6px;
+}
+
+.caller-routed-info {
+    font-size: 12px;
+    color: var(--text-tertiary);
+}
+
+/* Calling Ripple Effect */
+.calling-ripples {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 40px auto 0 auto;
+}
+
+.ripple {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--ios-green);
+    opacity: 0;
+    animation: ripplePulse 2.4s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.ripple.r2 { animation-delay: 0.8s; }
+.ripple.r3 { animation-delay: 1.6s; }
+
+@keyframes ripplePulse {
+    0% { transform: scale(0.6); opacity: 0.8; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+.incoming-actions {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.action-btn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-btn-group span {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.call-btn {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.call-btn:active {
+    transform: scale(0.9);
+}
+
+.btn-decline {
+    background-color: var(--ios-red);
+    color: white;
+    box-shadow: 0 4px 20px var(--ios-red-glow);
+}
+
+.btn-accept {
+    background-color: var(--ios-green);
+    color: white;
+    box-shadow: 0 4px 20px var(--ios-green-glow);
+}
+
+/* Active Call Layout */
+.active-call-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.active-status-badge {
+    font-size: 12px;
+    color: var(--ios-green);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+.active-caller-title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.active-call-timer {
+    font-size: 20px;
+    color: var(--text-secondary);
+    font-family: monospace;
+    margin-top: 4px;
+}
+
+.active-call-codec-tag {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+}
+
+/* 6-Button In-Call Controls */
+.active-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px 16px;
+    max-width: 310px;
+    margin: 0 auto;
+}
+
+.incall-ctrl-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    gap: 8px;
+}
+
+.ctrl-icon-circle {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.incall-ctrl-btn.active .ctrl-icon-circle {
+    background: #FFFFFF;
+    color: #000000;
+}
+
+.incall-ctrl-btn span {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* In-Call DTMF Modal */
+.incall-keypad-modal {
+    position: absolute;
+    bottom: 120px;
+    left: 20px;
+    right: 20px;
+    background: rgba(25, 25, 30, 0.95);
+    backdrop-filter: blur(25px);
+    border-radius: 20px;
+    border: 1px solid var(--border-glass);
+    padding: 16px;
+    z-index: 120;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+}
+
+.incall-keypad-modal.hidden {
+    display: none;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.dtmf-digits-row {
+    height: 28px;
+    font-size: 20px;
+    letter-spacing: 2px;
+    text-align: center;
+    color: var(--ios-blue);
+    margin-bottom: 8px;
+    font-family: monospace;
+}
+
+.keypad-grid.compact {
+    gap: 8px;
+    max-width: 260px;
+    margin: 0 auto;
+}
+
+.dtmf-btn {
+    height: 48px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.dtmf-btn:active {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* End Call Row */
+.active-end-call-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.btn-end-call {
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background-color: var(--ios-red);
+    color: white;
+    box-shadow: 0 4px 20px var(--ios-red-glow);
+}

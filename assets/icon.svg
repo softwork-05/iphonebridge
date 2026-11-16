@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c1d27"/>
+      <stop offset="100%" stop-color="#0a0a0e"/>
+    </linearGradient>
+    <linearGradient id="phoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#30D158"/>
+      <stop offset="100%" stop-color="#1b8535"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="115" fill="url(#bg)"/>
+  
+  <!-- Outer glowing ring -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="url(#phoneGrad)" stroke-width="8" opacity="0.3" filter="url(#glow)"/>
+  <circle cx="256" cy="256" r="130" fill="none" stroke="#0A84FF" stroke-width="4" stroke-dasharray="12 12" opacity="0.6"/>
+
+  <!-- Phone handset icon -->
+  <g transform="translate(146, 146)">
+    <path fill="url(#phoneGrad)" filter="url(#glow)" d="M59.58 97.11c12.96 25.47 33.84 46.26 59.31 59.31l19.8-19.8c2.43-2.43 6.03-3.24 9.18-2.16 10.08 3.33 20.97 5.13 32.13 5.13 4.95 0 9 4.05 9 9V180c0 4.95-4.05 9-9 9-84.51 0-153-68.49-153-153 0-4.95 4.05-9 9-9H66c4.95 0 9 4.05 9 9 0 11.25 1.8 22.05 5.13 32.13.99 3.15.27 6.66-2.25 9.18l-18.3 15.8z"/>
+  </g>
+</svg>
