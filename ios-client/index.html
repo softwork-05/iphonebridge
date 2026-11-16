@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GSM Bridge">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+    <title>GSM Call Bridge - iOS Client</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app" class="ios-app-container">
+        
+        <!-- Status Bar (Safe Area Top) -->
+        <header class="status-header">
+            <div class="status-pill host-status" id="btnHostStatus">
+                <span class="status-indicator-dot" id="hostConnDot"></span>
+                <span class="host-name" id="hostLabel">Gateway</span>
+                <span class="host-battery" id="hostBattery">--%</span>
+                <span class="host-latency" id="hostLatency">--ms</span>
+            </div>
+
+            <div class="status-pill cellular-status" id="btnCellularStatus">
+                <span class="sim-carrier" id="simCarrier">Searching...</span>
+                <div class="signal-meter" id="signalBars" data-level="0">
+                    <span class="bar bar-1"></span>
+                    <span class="bar bar-2"></span>
+                    <span class="bar bar-3"></span>
+                    <span class="bar bar-4"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main View Area (Tabs) -->
+        <main class="views-container">
+            
+            <!-- KEYPAD TAB -->
+            <section id="viewKeypad" class="view active-view">
+                <div class="dialer-display">
+                    <div class="number-input-wrapper">
+                        <input type="tel" id="dialInput" placeholder="" readonly />
+                        <button type="button" class="btn-backspace" id="btnBackspace" title="Delete">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                                <line x1="18" y1="9" x2="12" y2="15"></line>
+                                <line x1="12" y1="9" x2="18" y2="15"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="sim-selector-badge" id="simSelectorBadge">
+                        Using Android SIM: <span id="currentSimLabel">Slot 1</span>
+                    </div>
+                </div>
+
+                <!-- 3x4 iOS Glass Keypad -->
+                <div class="keypad-grid">
+                    <button class="keypad-btn" data-key="1">
+                        <span class="key-digit">1</span>
+                        <span class="key-letters">&nbsp;</span>
+                    </button>
+                    <button class="keypad-btn" data-key="2">
+                        <span class="key-digit">2</span>
+                        <span class="key-letters">A B C</span>
+                    </button>
+                    <button class="keypad-btn" data-key="3">
+                        <span class="key-digit">3</span>
+                        <span class="key-letters">D E F</span>
+                    </button>
+
+                    <button class="keypad-btn" data-key="4">
+                        <span class="key-digit">4</span>
+                        <span class="key-letters">G H I</span>
+                    </button>
+                    <button class="keypad-btn" data-key="5">
+                        <span class="key-digit">5</span>
+                        <span class="key-letters">J K L</span>
+                    </button>
+                    <button class="keypad-btn" data-key="6">
+                        <span class="key-digit">6</span>
+                        <span class="key-letters">M N O</span>
+                    </button>
+
+                    <button class="keypad-btn" data-key="7">
+                        <span class="key-digit">7</span>
+                        <span class="key-letters">P Q R S</span>
+                    </button>
+                    <button class="keypad-btn" data-key="8">
+                        <span class="key-digit">8</span>
+                        <span class="key-letters">T U V</span>
+                    </button>
+                    <button class="keypad-btn" data-key="9">
+                        <span class="key-digit">9</span>
+                        <span class="key-letters">W X Y Z</span>
+                    </button>
+
+                    <button class="keypad-btn" data-key="*">
+                        <span class="key-digit star">*</span>
+                        <span class="key-letters">&nbsp;</span>
+                    </button>
+                    <button class="keypad-btn" data-key="0">
+                        <span class="key-digit">0</span>
+                        <span class="key-letters">+</span>
+                    </button>
+                    <button class="keypad-btn" data-key="#">
+                        <span class="key-digit">#</span>
+                        <span class="key-letters">&nbsp;</span>
+                    </button>
+                </div>
+
+                <!-- Bottom Call Button Row -->
+                <div class="call-action-row">
+                    <button class="btn-start-call" id="btnCall" title="Call">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- RECENTS TAB -->
+            <section id="viewRecents" class="view">
+                <div class="view-header">
+                    <h2>Recent Calls</h2>
+                    <button class="btn-clear-logs" id="btnClearLogs">Clear</button>
+                </div>
+                <div class="recents-list" id="recentsList">
+                    <!-- Populated dynamically via JS -->
+                    <div class="empty-state">No recent GSM calls</div>
+                </div>
+            </section>
+
+            <!-- SETTINGS TAB -->
+            <section id="viewSettings" class="view">
+                <div class="view-header">
+                    <h2>Gateway Settings</h2>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-item">
+                        <span>Android Host Address</span>
+                        <input type="text" id="inputHostAddress" placeholder="192.168.43.1:8080" />
+                    </label>
+                    <div class="settings-item">
+                        <span>Connection Protocol</span>
+                        <span class="settings-value" id="protocolBadge">WebSockets + WebRTC</span>
+                    </div>
+                    <div class="settings-item">
+                        <span>Audio Codec</span>
+                        <span class="settings-value">Opus 48kHz (Low Latency)</span>
+                    </div>
+                    <label class="settings-item">
+                        <span>Preferred Audio Output</span>
+                        <select id="selectAudioOutput">
+                            <option value="earpiece">iPhone Earpiece (Receiver)</option>
+                            <option value="speaker">Speakerphone</option>
+                        </select>
+                    </label>
+                    <div class="settings-item">
+                        <span>Microphone Permission</span>
+                        <button class="btn-secondary" id="btnReqMic">Grant Mic</button>
+                    </div>
+                    <div class="settings-item">
+                        <span>Audio Engine Status</span>
+                        <span class="settings-value" id="audioContextStatus">Locked (Tap to enable)</span>
+                    </div>
+                </div>
+
+                <div class="settings-action">
+                    <button class="btn-primary" id="btnReconnect">Save &amp; Reconnect</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Tab Bar -->
+        <nav class="bottom-tab-bar">
+            <button class="tab-item active" data-target="viewKeypad">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="5" cy="5" r="2"></circle><circle cx="12" cy="5" r="2"></circle><circle cx="19" cy="5" r="2"></circle>
+                    <circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle>
+                    <circle cx="5" cy="19" r="2"></circle><circle cx="12" cy="19" r="2"></circle><circle cx="19" cy="19" r="2"></circle>
+                </svg>
+                <span>Keypad</span>
+            </button>
+            <button class="tab-item" data-target="viewRecents">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Recents</span>
+            </button>
+            <button class="tab-item" data-target="viewSettings">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <span>Settings</span>
+            </button>
+        </nav>
+
+        <!-- FULLSCREEN SIMULATED NATIVE iOS INCOMING CALL OVERLAY -->
+        <div id="incomingCallOverlay" class="fullscreen-call-overlay incoming-overlay hidden">
+            <div class="call-overlay-bg"></div>
+            <div class="incoming-info-header">
+                <span class="call-type-badge">GSM Cellular Call</span>
+                <h1 class="caller-name" id="incCallerName">Incoming Call</h1>
+                <p class="caller-subtext" id="incCallerNumber">+1 (555) 019-2834</p>
+                <p class="caller-routed-info">Routed via Android SIM Gateway</p>
+                
+                <div class="calling-ripples">
+                    <div class="ripple r1"></div>
+                    <div class="ripple r2"></div>
+                    <div class="ripple r3"></div>
+                </div>
+            </div>
+
+            <div class="incoming-actions">
+                <div class="action-btn-group">
+                    <button class="call-btn btn-decline" id="btnDeclineCall">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+                        </svg>
+                    </button>
+                    <span>Decline</span>
+                </div>
+
+                <div class="action-btn-group">
+                    <button class="call-btn btn-accept" id="btnAcceptCall">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                    </button>
+                    <span>Accept</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FULLSCREEN ACTIVE CALL OVERLAY -->
+        <div id="activeCallOverlay" class="fullscreen-call-overlay active-overlay hidden">
+            <div class="call-overlay-bg"></div>
+            <div class="active-call-header">
+                <span class="active-status-badge" id="activeCallStatusBadge">Connected</span>
+                <h1 class="active-caller-title" id="activeCallerTitle">+1 (555) 019-2834</h1>
+                <p class="active-call-timer" id="activeCallTimer">00:00</p>
+                <p class="active-call-codec-tag">Opus HD Voice • SIM Route</p>
+            </div>
+
+            <!-- In-Call Control Grid -->
+            <div class="active-controls-grid">
+                <button class="incall-ctrl-btn" id="btnToggleMute">
+                    <div class="ctrl-icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    </div>
+                    <span>Mute</span>
+                </button>
+
+                <button class="incall-ctrl-btn" id="btnToggleKeypadModal">
+                    <div class="ctrl-icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="5" cy="5" r="2"></circle><circle cx="12" cy="5" r="2"></circle><circle cx="19" cy="5" r="2"></circle>
+                            <circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle>
+                            <circle cx="5" cy="19" r="2"></circle><circle cx="12" cy="19" r="2"></circle><circle cx="19" cy="19" r="2"></circle>
+                        </svg>
+                    </div>
+                    <span>Keypad</span>
+                </button>
+
+                <button class="incall-ctrl-btn" id="btnToggleSpeaker">
+                    <div class="ctrl-icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        </svg>
+                    </div>
+                    <span id="speakerLabel">Speaker</span>
+                </button>
+
+                <button class="incall-ctrl-btn" id="btnHoldCall">
+                    <div class="ctrl-icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                    </div>
+                    <span>Hold</span>
+                </button>
+
+                <button class="incall-ctrl-btn" id="btnShowStats">
+                    <div class="ctrl-icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                    </div>
+                    <span>Quality</span>
+                </button>
+
+                <button class="incall-ctrl-btn" id="btnHostInfo">
+                    <div class="ctrl-icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        </svg>
+                    </div>
+                    <span>Host SIM</span>
+                </button>
+            </div>
+
+            <!-- In-Call DTMF Mini Keypad Overlay -->
+            <div id="incallKeypadModal" class="incall-keypad-modal hidden">
+                <div class="modal-header">
+                    <span>DTMF Tone Keypad</span>
+                    <button class="btn-close-modal" id="btnCloseDtmf">✕</button>
+                </div>
+                <div class="dtmf-digits-row" id="dtmfDigitsStream"></div>
+                <div class="keypad-grid compact">
+                    <!-- Standard digits 0-9, *, # -->
+                    <button class="dtmf-btn" data-key="1">1</button>
+                    <button class="dtmf-btn" data-key="2">2</button>
+                    <button class="dtmf-btn" data-key="3">3</button>
+                    <button class="dtmf-btn" data-key="4">4</button>
+                    <button class="dtmf-btn" data-key="5">5</button>
+                    <button class="dtmf-btn" data-key="6">6</button>
+                    <button class="dtmf-btn" data-key="7">7</button>
+                    <button class="dtmf-btn" data-key="8">8</button>
+                    <button class="dtmf-btn" data-key="9">9</button>
+                    <button class="dtmf-btn" data-key="*">*</button>
+                    <button class="dtmf-btn" data-key="0">0</button>
+                    <button class="dtmf-btn" data-key="#">#</button>
+                </div>
+            </div>
+
+            <!-- Red End Call Button -->
+            <div class="active-end-call-row">
+                <button class="call-btn btn-end-call" id="btnEndCall" title="End Call">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Hidden WebRTC Audio Element for Output Streaming -->
+        <audio id="remoteAudioStream" autoplay playsinline></audio>
+
+    </div>
+
+    <!-- Application Scripts -->
+    <script src="js/audio-manager.js"></script>
+    <script src="js/webrtc-client.js"></script>
+    <script src="js/dialer.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
